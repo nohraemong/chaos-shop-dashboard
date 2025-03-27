@@ -54,7 +54,6 @@ def generate_purchase_history(num_records):
             'product_name': random.sample(product_name, 1)[0],
             'quantity': random.randint(1, 5),
             'cost': random.sample(product_cost, 1)[0],
-            'discount_percentage':  
             'product_season': random.sample(season, 1),
             'review_rating': random.randint(1, 5),
             'promo_code_used' : random.sample(subscribed, 1),
