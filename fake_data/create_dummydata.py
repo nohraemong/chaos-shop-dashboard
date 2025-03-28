@@ -87,20 +87,27 @@ def generate_purchase_history(num_records):
 
     return pd.DataFrame(purchase_history), pd.DataFrame(purchase_user), pd.DataFrame(customer_behavior)
 
-def save_to_s3(df, bucket_name, file_prefix):
+def save_to_s3(df, bucket_name, file_prefix, df_name=None):
     s3_client = boto3.client('s3')
     csv_buffer = StringIO()
     df.to_csv(csv_buffer, index=False)
     date_str = datetime.now().strftime("%Y-%m-%d")
-    file_name = f"{df}/{date_str}/{file_prefix}.csv"
-    s3_client.put_object(Bucket=bucket_name, Key=file_name, Body=csv_buffer.getvalue())
+    if df_name == 'purchase_history':
+        file_name = f"chaos_shop/purchase_history/{date_str}/{file_prefix}.csv"
+        s3_client.put_object(Bucket=bucket_name, Key=file_name, Body=csv_buffer.getvalue())
+    elif df_name == 'purchase_user':
+        file_name = f"chaos_shop/purchase_user/{date_str}/{file_prefix}.csv"
+        s3_client.put_object(Bucket=bucket_name, Key=file_name, Body=csv_buffer.getvalue())
+    else:
+        file_name = f"chaos_shop/customer_behavior/{date_str}/{file_prefix}.csv"
+        s3_client.put_object(Bucket=bucket_name, Key=file_name, Body=csv_buffer.getvalue())
 
     print(f"{file_name} uploaded to {bucket_name}")
 
-purchase_history, purchase_user, customer_behavior = generate_purchase_history(1000000)
+purchase_history, purchase_user, customer_behavior = generate_purchase_history(100000)
 
-bucket_name = "your-s3-bucket-name"
-save_to_s3(purchase_history, bucket_name, fake.uuid4())
-save_to_s3(purchase_user, bucket_name, fake.uuid4())
-save_to_s3(customer_behavior, bucket_name, fake.uuid4())
-
+#change bucket name
+bucket_name = "your_bucket_name"
+save_to_s3(purchase_history, bucket_name, fake.uuid4(), df_name='purchase_history')
+save_to_s3(purchase_user, bucket_name, fake.uuid4(), df_name='purchase_user')
+save_to_s3(customer_behavior, bucket_name, fake.uuid4(), df_name='customer_behavior')
